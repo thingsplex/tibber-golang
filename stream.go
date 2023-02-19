@@ -12,7 +12,7 @@ import (
 )
 
 const subscriptionEndpoint = "v1-beta/gql/subscriptions"
-const tibberHost = "api.tibber.com"
+const tibberHost = "websocket-api.tibber.com"
 
 const (
 	StreamStateConnected    = "CONNECTED"

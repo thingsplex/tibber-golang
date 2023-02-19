@@ -1,15 +1,36 @@
 package tibber
 
 import (
-	"io/ioutil"
+	"gopkg.in/yaml.v3"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
 )
 
+type TestConfig struct {
+	Endpoint string `yaml:"endpoint"`
+	Token    string `yaml:"token"`
+	HomeID   string `yaml:"homeId"`
+}
+
+// load TestConfig from yaml file
+func loadTestConfig() TestConfig {
+	var tc TestConfig
+	bytes, err := os.ReadFile("test-config.yaml")
+	if err != nil {
+		panic(err)
+	}
+	err = yaml.Unmarshal(bytes, &tc)
+	if err != nil {
+		panic(err)
+	}
+	return tc
+}
+
 func helperLoadBytes(t *testing.T, name string) []byte {
 	path := filepath.Join("testdata", name) // relative path
-	bytes, err := ioutil.ReadFile(path)
+	bytes, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,8 +67,10 @@ func TestPush(t *testing.T) {
 
 func TestStreams(t *testing.T) {
 	var msgCh MsgChan
-	token := string(helperLoadBytes(t, "token.txt"))
-	homeID := string(helperLoadBytes(t, "homeId.txt"))
+	testConfig := loadTestConfig()
+	token := testConfig.Token
+	homeID := testConfig.HomeID
+	t.Logf("homeID: %s", homeID)
 	stream := NewStream(homeID, token)
 	err := stream.StartSubscription(msgCh)
 	if err != nil {
